@@ -32,10 +32,19 @@ class Session {
             return { success: false, error: 'Team name must be 30 characters or less.' };
         }
 
-        // Check uniqueness
-        for (const [, player] of this.players) {
+        // Check if same name exists (reconnecting player)
+        for (const [oldSocketId, player] of this.players) {
             if (player.teamName.toLowerCase() === trimmed.toLowerCase()) {
-                return { success: false, error: 'Team name already taken.' };
+                // Replace old socket entry with new one (reconnection)
+                this.players.delete(oldSocketId);
+                const existingOrder = player.joinOrder;
+                this.players.set(socketId, {
+                    teamName: player.teamName,
+                    joinOrder: existingOrder,
+                    buzzed: player.buzzed,
+                    online: true,
+                });
+                return { success: true, teamName: player.teamName, joinOrder: existingOrder };
             }
         }
 

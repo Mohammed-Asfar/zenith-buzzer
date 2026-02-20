@@ -242,20 +242,26 @@
         document.getElementById('btn-open').addEventListener('click', () => {
             socket.emit(EVENTS.ADMIN_OPEN_BUZZER, {});
             playRoundStartSound();
+            startTimer(); // Auto-start timer when buzzer opens
         });
 
         document.getElementById('btn-close').addEventListener('click', () => {
             socket.emit(EVENTS.ADMIN_CLOSE_BUZZER);
+            stopTimer(); // Auto-stop timer when buzzer closes
         });
 
         document.getElementById('btn-reset').addEventListener('click', () => {
             socket.emit(EVENTS.ADMIN_RESET_ROUND);
+            stopTimer();
+            resetTimerDisplay();
         });
 
         document.getElementById('btn-next').addEventListener('click', () => {
             const currentRound = parseInt($sessionRound.textContent) || 0;
             $sessionTotalRounds.textContent = currentRound;
             socket.emit(EVENTS.ADMIN_NEXT_ROUND);
+            stopTimer();
+            resetTimerDisplay();
         });
 
         // Copy link
@@ -299,35 +305,13 @@
             }
         });
 
-        // Timer
+        // Timer — manual start/stop still available
         document.getElementById('btn-timer-start').addEventListener('click', () => {
-            const btn = document.getElementById('btn-timer-start');
             if (timerInterval) {
-                // Stop timer
-                clearInterval(timerInterval);
-                timerInterval = null;
-                btn.textContent = 'Start';
-                return;
+                stopTimer();
+            } else {
+                startTimer();
             }
-
-            timerSeconds = parseInt($timerInput.value) || 30;
-            updateTimerDisplay(timerSeconds);
-            btn.textContent = 'Stop';
-
-            timerInterval = setInterval(() => {
-                timerSeconds--;
-                updateTimerDisplay(timerSeconds);
-                if (timerSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    btn.textContent = 'Start';
-                    // Auto-close buzzer
-                    if (currentState === EVENTS.ROUND_OPEN) {
-                        socket.emit(EVENTS.ADMIN_CLOSE_BUZZER);
-                    }
-                    playTimerEndSound();
-                }
-            }, 1000);
         });
 
         // Export
@@ -357,6 +341,42 @@
             $timerDisplay.classList.add('text-text-primary');
             $timerDisplay.classList.remove('text-danger', 'text-warning');
         }
+    }
+
+    // ── Timer helpers ──
+    function startTimer() {
+        if (timerInterval) return; // Already running
+        const btn = document.getElementById('btn-timer-start');
+        timerSeconds = parseInt($timerInput.value) || 30;
+        updateTimerDisplay(timerSeconds);
+        btn.textContent = 'Stop';
+
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+            updateTimerDisplay(timerSeconds);
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.textContent = 'Start';
+                // Auto-close buzzer when timer ends
+                if (currentState === EVENTS.ROUND_OPEN) {
+                    socket.emit(EVENTS.ADMIN_CLOSE_BUZZER);
+                }
+                playTimerEndSound();
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (!timerInterval) return;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('btn-timer-start').textContent = 'Start';
+    }
+
+    function resetTimerDisplay() {
+        const defaultSeconds = parseInt($timerInput.value) || 30;
+        updateTimerDisplay(defaultSeconds);
     }
 
     // ── Utils ──

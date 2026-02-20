@@ -61,6 +61,7 @@ function createServer(port = 3000) {
             if (session.resetRound()) {
                 io.of('/player').emit(EVENTS.SERVER_ROUND_STATE, { state: EVENTS.ROUND_IDLE });
                 adminNsp.emit(EVENTS.SERVER_ROUND_STATE, session.getRoundState());
+                adminNsp.emit(EVENTS.SERVER_PLAYER_LIST, session.getPlayerList());
             }
         });
 
@@ -68,6 +69,7 @@ function createServer(port = 3000) {
             const newRound = session.nextRound();
             io.of('/player').emit(EVENTS.SERVER_ROUND_STATE, { state: EVENTS.ROUND_IDLE, roundNumber: newRound });
             adminNsp.emit(EVENTS.SERVER_ROUND_STATE, session.getRoundState());
+            adminNsp.emit(EVENTS.SERVER_PLAYER_LIST, session.getPlayerList());
         });
 
         // Player management
@@ -138,6 +140,10 @@ function createServer(port = 3000) {
                     rank: result.rank,
                     timestamp: result.timestamp,
                 });
+                // Send updated round state so rankings refresh in real-time
+                adminNsp.emit(EVENTS.SERVER_ROUND_STATE, session.getRoundState());
+                // Update player list so BUZZED indicator shows
+                adminNsp.emit(EVENTS.SERVER_PLAYER_LIST, session.getPlayerList());
             }
         });
 
