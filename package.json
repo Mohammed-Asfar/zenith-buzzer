@@ -1,0 +1,31 @@
+{
+  "name": "zenith-buzzer",
+  "version": "1.0.0",
+  "description": "Offline Quiz Buzzer System — plug-and-play desktop app for quiz competitions",
+  "main": "src/main/main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build:css:admin": "npx @tailwindcss/cli -i src/admin/admin.css -o src/admin/dist/admin.css --minify",
+    "build:css:player": "npx @tailwindcss/cli -i src/player/player.css -o src/player/dist/player.css --minify",
+    "build:css": "npm run build:css:admin && npm run build:css:player",
+    "watch:css:admin": "npx @tailwindcss/cli -i src/admin/admin.css -o src/admin/dist/admin.css --watch",
+    "watch:css:player": "npx @tailwindcss/cli -i src/player/player.css -o src/player/dist/player.css --watch",
+    "start": "npm run build:css && electron .",
+    "build": "npm run build:css && electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "howler": "^2.2.4",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.0",
+    "socket.io-client": "^4.8.0"
+  }
+}
