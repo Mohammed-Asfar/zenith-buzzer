@@ -95,6 +95,10 @@ class Session {
         return list.sort((a, b) => a.joinOrder - b.joinOrder);
     }
 
+    getPlayerBySocketId(socketId) {
+        return this.players.get(socketId) || null;
+    }
+
     clearPlayers() {
         this.players.clear();
         this.joinCounter = 0;
@@ -102,6 +106,33 @@ class Session {
 
     setJoinLocked(locked) {
         this.joinLocked = locked;
+    }
+
+    renamePlayer(socketId, newName) {
+        const trimmed = (newName || '').trim();
+        if (!trimmed || trimmed.length > 30) return { success: false };
+
+        // Check uniqueness (excluding the requester)
+        for (const [sid, p] of this.players) {
+            if (sid !== socketId && p.teamName.toLowerCase() === trimmed.toLowerCase()) {
+                return { success: false, error: 'Name already taken.' };
+            }
+        }
+
+        const player = this.players.get(socketId);
+        if (!player) return { success: false };
+
+        const oldName = player.teamName;
+        player.teamName = trimmed;
+
+        // Update any buzzes in current round
+        for (const buzz of this.buzzes) {
+            if (buzz.teamName === oldName) {
+                buzz.teamName = trimmed;
+            }
+        }
+
+        return { success: true, oldName, newName: trimmed };
     }
 
     // ── Round Management ──

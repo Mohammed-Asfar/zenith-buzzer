@@ -9,6 +9,8 @@
         SERVER_JOIN_RESULT: 'server:joinResult',
         SERVER_ROUND_STATE: 'server:roundState',
         SERVER_BUZZ_RANK: 'server:buzzRank',
+        PLAYER_REQUEST_NAME_CHANGE: 'player:requestNameChange',
+        SERVER_NAME_CHANGE_RESULT: 'server:nameChangeResult',
         ROUND_IDLE: 'IDLE',
         ROUND_OPEN: 'OPEN',
         ROUND_CLOSED: 'CLOSED',
@@ -37,6 +39,11 @@
 
         socket.on('connect', () => {
             console.log('[Player] Connected:', socket.id);
+            // Auto-rejoin if team name is saved from a previous session
+            const saved = localStorage.getItem('zenith-team');
+            if (saved && !teamName) {
+                autoRejoin(saved);
+            }
         });
 
         socket.on(EVENTS.SERVER_ROUND_STATE, (data) => {
@@ -48,6 +55,7 @@
         });
 
         socket.on('server:kicked', () => {
+            localStorage.removeItem('zenith-team');
             alert('You have been removed by the admin.');
             location.reload();
         });
@@ -58,6 +66,21 @@
 
         socket.on('reconnect', () => {
             $statusMsg.innerHTML = '<p class="text-success text-lg">Reconnected!</p>';
+        });
+
+        socket.on(EVENTS.SERVER_NAME_CHANGE_RESULT, (data) => {
+            const $status = document.getElementById('name-change-status');
+            if (data.approved) {
+                teamName = data.newName;
+                localStorage.setItem('zenith-team', teamName);
+                $teamLabel.textContent = teamName;
+                document.getElementById('name-change-form').classList.add('hidden');
+                $status.classList.add('hidden');
+            } else {
+                $status.textContent = data.reason || 'Request denied';
+                $status.className = 'text-xs text-center text-danger';
+                $status.classList.remove('hidden');
+            }
         });
     }
 
@@ -79,6 +102,7 @@
         socket.emit(EVENTS.PLAYER_JOIN, { teamName: name }, (result) => {
             if (result.success) {
                 teamName = result.teamName;
+                localStorage.setItem('zenith-team', teamName);
                 $teamLabel.textContent = teamName;
                 $joinScreen.classList.add('hidden');
                 $buzzerScreen.classList.remove('hidden');
@@ -93,11 +117,25 @@
     function showError(msg) {
         $joinError.textContent = msg;
         $joinError.classList.remove('hidden');
-        // Shake animation
         $teamInput.classList.add('ring-2', 'ring-danger');
         setTimeout(() => {
             $teamInput.classList.remove('ring-2', 'ring-danger');
         }, 1500);
+    }
+
+    // Auto-rejoin with saved team name
+    function autoRejoin(name) {
+        socket.emit(EVENTS.PLAYER_JOIN, { teamName: name }, (result) => {
+            if (result.success) {
+                teamName = result.teamName;
+                $teamLabel.textContent = teamName;
+                $joinScreen.classList.add('hidden');
+                $buzzerScreen.classList.remove('hidden');
+            } else {
+                // Saved name no longer valid, clear and show join screen
+                localStorage.removeItem('zenith-team');
+            }
+        });
     }
 
     // ── Buzzer State ──
@@ -171,6 +209,30 @@
         if (e.key === 'Enter') doJoin();
     });
     $btnBuzz.addEventListener('click', doBuzz);
+
+    // Name change UI
+    document.getElementById('btn-edit-name').addEventListener('click', () => {
+        const $form = document.getElementById('name-change-form');
+        $form.classList.toggle('hidden');
+        if (!$form.classList.contains('hidden')) {
+            document.getElementById('new-name-input').focus();
+        }
+    });
+
+    document.getElementById('btn-cancel-name-change').addEventListener('click', () => {
+        document.getElementById('name-change-form').classList.add('hidden');
+        document.getElementById('name-change-status').classList.add('hidden');
+    });
+
+    document.getElementById('btn-submit-name-change').addEventListener('click', () => {
+        const newName = document.getElementById('new-name-input').value.trim();
+        if (!newName) return;
+        const $status = document.getElementById('name-change-status');
+        $status.textContent = 'Waiting for admin approval...';
+        $status.className = 'text-xs text-center text-warning';
+        $status.classList.remove('hidden');
+        socket.emit(EVENTS.PLAYER_REQUEST_NAME_CHANGE, { newName });
+    });
 
     // ── Boot ──
     connect();

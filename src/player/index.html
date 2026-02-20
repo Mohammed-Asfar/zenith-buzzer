@@ -42,9 +42,26 @@
         <!-- Team name header -->
         <div class="mb-6">
             <span
-                class="bg-bg-secondary border border-border rounded-full px-5 py-2 text-sm font-semibold text-text-secondary inline-block">
+                class="bg-bg-secondary border border-border rounded-full px-5 py-2 text-sm font-semibold text-text-secondary inline-flex items-center gap-2">
                 <span id="team-label"></span>
+                <button id="btn-edit-name" class="text-accent hover:text-accent-hover text-xs transition-colors"
+                    title="Request name change">✏️</button>
             </span>
+        </div>
+
+        <!-- Name change form (hidden) -->
+        <div id="name-change-form" class="hidden mb-6">
+            <div class="bg-bg-secondary border border-border rounded-xl p-4 space-y-3">
+                <input id="new-name-input" type="text" maxlength="30" placeholder="New team name"
+                    class="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-text-primary text-sm placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent" />
+                <div class="flex gap-2">
+                    <button id="btn-submit-name-change"
+                        class="flex-1 bg-accent hover:bg-accent-hover text-white text-sm py-2 rounded-lg font-semibold transition-colors">Request</button>
+                    <button id="btn-cancel-name-change"
+                        class="flex-1 bg-bg-hover text-text-secondary text-sm py-2 rounded-lg font-semibold transition-colors">Cancel</button>
+                </div>
+                <p id="name-change-status" class="hidden text-xs text-center"></p>
+            </div>
         </div>
 
         <!-- Status message -->

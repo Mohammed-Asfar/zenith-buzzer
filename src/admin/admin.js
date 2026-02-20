@@ -16,6 +16,9 @@
         SERVER_BUZZ_RECEIVED: 'server:buzzReceived',
         SERVER_ROUND_STATE: 'server:roundState',
         SERVER_PLAYER_LIST: 'server:playerList',
+        SERVER_NAME_CHANGE_REQUEST: 'server:nameChangeRequest',
+        ADMIN_APPROVE_NAME_CHANGE: 'admin:approveNameChange',
+        ADMIN_DENY_NAME_CHANGE: 'admin:denyNameChange',
         ROUND_IDLE: 'IDLE',
         ROUND_OPEN: 'OPEN',
         ROUND_CLOSED: 'CLOSED',
@@ -26,6 +29,7 @@
     let timerInterval = null;
     let timerSeconds = 0;
     let currentState = EVENTS.ROUND_IDLE;
+    let pendingRequests = [];
 
     // ── Sound context (Web Audio API for synthesized sounds) ──
     let audioCtx;
@@ -137,6 +141,12 @@
 
         socket.on(EVENTS.SERVER_PLAYER_LEFT, (data) => {
             // Player list update will follow
+        });
+
+        socket.on(EVENTS.SERVER_NAME_CHANGE_REQUEST, (data) => {
+            pendingRequests.push(data);
+            renderNameRequests();
+            playTone(600, 0.15, 'sine'); // notification sound
         });
     }
 
@@ -264,6 +274,18 @@
             resetTimerDisplay();
         });
 
+        // Connection dialog
+        const $dialog = document.getElementById('connection-dialog');
+        document.getElementById('btn-show-connection').addEventListener('click', () => {
+            $dialog.classList.remove('hidden');
+        });
+        document.getElementById('btn-close-dialog').addEventListener('click', () => {
+            $dialog.classList.add('hidden');
+        });
+        $dialog.addEventListener('click', (e) => {
+            if (e.target === $dialog) $dialog.classList.add('hidden');
+        });
+
         // Copy link
         document.getElementById('btn-copy-link').addEventListener('click', async () => {
             const url = $joinURL.textContent;
@@ -385,6 +407,46 @@
         div.textContent = str;
         return div.innerHTML;
     }
+
+    // ── Name Change Requests ──
+    function renderNameRequests() {
+        const $list = document.getElementById('name-req-list');
+        const $count = document.getElementById('name-req-count');
+        $count.textContent = `(${pendingRequests.length})`;
+
+        if (pendingRequests.length === 0) {
+            $list.innerHTML = '<p class="text-text-muted text-xs text-center py-3">No pending requests</p>';
+            return;
+        }
+
+        $list.innerHTML = pendingRequests.map((req) => `
+          <div class="bg-bg-primary rounded-xl px-3 py-2.5 animate-fade-in" id="req-${req.requestId}">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-text-muted text-xs">"${escapeHTML(req.oldName)}"</span>
+              <span class="text-accent text-xs">→</span>
+              <span class="text-text-primary text-xs font-semibold">"${escapeHTML(req.newName)}"</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="approveNameChange('${req.requestId}')"
+                class="flex-1 bg-success/20 hover:bg-success/30 text-success text-xs py-1.5 rounded-lg font-semibold transition-colors">✓ Approve</button>
+              <button onclick="denyNameChange('${req.requestId}')"
+                class="flex-1 bg-danger/20 hover:bg-danger/30 text-danger text-xs py-1.5 rounded-lg font-semibold transition-colors">✕ Deny</button>
+            </div>
+          </div>
+        `).join('');
+    }
+
+    window.approveNameChange = function (requestId) {
+        socket.emit(EVENTS.ADMIN_APPROVE_NAME_CHANGE, { requestId });
+        pendingRequests = pendingRequests.filter(r => r.requestId !== requestId);
+        renderNameRequests();
+    };
+
+    window.denyNameChange = function (requestId) {
+        socket.emit(EVENTS.ADMIN_DENY_NAME_CHANGE, { requestId });
+        pendingRequests = pendingRequests.filter(r => r.requestId !== requestId);
+        renderNameRequests();
+    };
 
     // Expose removePlayer globally for inline onclick
     window.removePlayer = function (teamName) {

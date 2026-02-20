@@ -18,6 +18,7 @@ function createServer(port = 3000) {
         cors: { origin: '*' },
     });
     const session = new Session();
+    const pendingNameChanges = new Map(); // requestId → { socketId, oldName, newName }
 
     // ── Static files ──
     // Serve player pages
@@ -91,10 +92,48 @@ function createServer(port = 3000) {
         });
 
         socket.on(EVENTS.ADMIN_CLEAR_PLAYERS, () => {
-            // Disconnect all player sockets
             io.of('/player').disconnectSockets(true);
             session.clearPlayers();
             adminNsp.emit(EVENTS.SERVER_PLAYER_LIST, session.getPlayerList());
+        });
+
+        // Name change approve/deny
+        socket.on(EVENTS.ADMIN_APPROVE_NAME_CHANGE, ({ requestId }) => {
+            const req = pendingNameChanges.get(requestId);
+            if (!req) return;
+            pendingNameChanges.delete(requestId);
+
+            const result = session.renamePlayer(req.socketId, req.newName);
+            const playerSocket = io.of('/player').sockets.get(req.socketId);
+
+            if (result.success) {
+                if (playerSocket) {
+                    playerSocket.emit(EVENTS.SERVER_NAME_CHANGE_RESULT, {
+                        approved: true, newName: result.newName,
+                    });
+                }
+                adminNsp.emit(EVENTS.SERVER_PLAYER_LIST, session.getPlayerList());
+                adminNsp.emit(EVENTS.SERVER_ROUND_STATE, session.getRoundState());
+            } else {
+                if (playerSocket) {
+                    playerSocket.emit(EVENTS.SERVER_NAME_CHANGE_RESULT, {
+                        approved: false, reason: result.error || 'Failed',
+                    });
+                }
+            }
+        });
+
+        socket.on(EVENTS.ADMIN_DENY_NAME_CHANGE, ({ requestId }) => {
+            const req = pendingNameChanges.get(requestId);
+            if (!req) return;
+            pendingNameChanges.delete(requestId);
+
+            const playerSocket = io.of('/player').sockets.get(req.socketId);
+            if (playerSocket) {
+                playerSocket.emit(EVENTS.SERVER_NAME_CHANGE_RESULT, {
+                    approved: false, reason: 'Denied by admin',
+                });
+            }
         });
 
         // Export
@@ -154,6 +193,33 @@ function createServer(port = 3000) {
                 adminNsp.emit(EVENTS.SERVER_PLAYER_LEFT, { teamName: player.teamName });
                 adminNsp.emit(EVENTS.SERVER_PLAYER_LIST, session.getPlayerList());
             }
+        });
+
+        // Name change request
+        socket.on(EVENTS.PLAYER_REQUEST_NAME_CHANGE, ({ newName }) => {
+            const player = session.getPlayerBySocketId(socket.id);
+            if (!player) return;
+
+            const trimmed = (newName || '').trim();
+            if (!trimmed || trimmed.length > 30) {
+                socket.emit(EVENTS.SERVER_NAME_CHANGE_RESULT, {
+                    approved: false, reason: 'Invalid name',
+                });
+                return;
+            }
+
+            const requestId = Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            pendingNameChanges.set(requestId, {
+                socketId: socket.id,
+                oldName: player.teamName,
+                newName: trimmed,
+            });
+
+            adminNsp.emit(EVENTS.SERVER_NAME_CHANGE_REQUEST, {
+                requestId,
+                oldName: player.teamName,
+                newName: trimmed,
+            });
         });
     });
 

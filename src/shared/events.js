@@ -10,10 +10,13 @@ module.exports = {
   ADMIN_REMOVE_PLAYER: 'admin:removePlayer',
   ADMIN_LOCK_JOINS: 'admin:lockJoins',
   ADMIN_CLEAR_PLAYERS: 'admin:clearPlayers',
+  ADMIN_APPROVE_NAME_CHANGE: 'admin:approveNameChange',
+  ADMIN_DENY_NAME_CHANGE: 'admin:denyNameChange',
 
   // Player → Server
   PLAYER_JOIN: 'player:join',
   PLAYER_BUZZ: 'player:buzz',
+  PLAYER_REQUEST_NAME_CHANGE: 'player:requestNameChange',
 
   // Server → Admin
   SERVER_PLAYER_JOINED: 'server:playerJoined',
@@ -21,10 +24,12 @@ module.exports = {
   SERVER_BUZZ_RECEIVED: 'server:buzzReceived',
   SERVER_ROUND_STATE: 'server:roundState',
   SERVER_PLAYER_LIST: 'server:playerList',
+  SERVER_NAME_CHANGE_REQUEST: 'server:nameChangeRequest',
 
   // Server → Player
   SERVER_JOIN_RESULT: 'server:joinResult',
   SERVER_BUZZ_RANK: 'server:buzzRank',
+  SERVER_NAME_CHANGE_RESULT: 'server:nameChangeResult',
 
   // Round states
   ROUND_IDLE: 'IDLE',
