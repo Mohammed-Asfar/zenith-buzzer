@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Zenith Buzzer</title>
+    <link rel="stylesheet" href="dist/player.css" />
+</head>
+
+<body class="min-h-screen bg-bg-primary flex items-center justify-center p-4">
+
+    <!-- ═══ JOIN SCREEN ═══ -->
+    <div id="join-screen" class="w-full max-w-sm mx-auto">
+        <div class="bg-bg-secondary rounded-3xl border border-border p-8 shadow-2xl">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-4">
+                    <span class="text-4xl">⚡</span>
+                </div>
+                <h1 class="text-2xl font-bold text-text-primary tracking-tight">Zenith Buzzer</h1>
+                <p class="text-text-muted text-sm mt-1">Enter your team name to join</p>
+            </div>
+
+            <!-- Form -->
+            <div class="space-y-4">
+                <div>
+                    <input id="team-name-input" type="text" maxlength="30" placeholder="Team name" autocomplete="off"
+                        class="w-full bg-bg-primary border border-border rounded-xl px-4 py-3.5 text-text-primary text-lg placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all" />
+                </div>
+                <div id="join-error" class="hidden text-danger text-sm text-center font-medium"></div>
+                <button id="btn-join"
+                    class="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3.5 rounded-xl text-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+                    Join Game
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ BUZZER SCREEN ═══ -->
+    <div id="buzzer-screen" class="hidden w-full max-w-sm mx-auto text-center">
+        <!-- Team name header -->
+        <div class="mb-6">
+            <span
+                class="bg-bg-secondary border border-border rounded-full px-5 py-2 text-sm font-semibold text-text-secondary inline-block">
+                <span id="team-label"></span>
+            </span>
+        </div>
+
+        <!-- Status message -->
+        <div id="status-msg" class="mb-8">
+            <p class="text-text-muted text-lg">Waiting for round to start...</p>
+        </div>
+
+        <!-- Buzzer Button -->
+        <div class="relative">
+            <button id="btn-buzz"
+                class="w-48 h-48 mx-auto rounded-full bg-gradient-to-b from-buzzer to-buzzer-active text-white text-3xl font-black uppercase tracking-wider shadow-2xl transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                disabled>
+                BUZZ!
+            </button>
+        </div>
+
+        <!-- Rank Display (hidden initially) -->
+        <div id="rank-display" class="hidden mt-10">
+            <div class="animate-rank-pop">
+                <span id="rank-icon" class="text-6xl block mb-2"></span>
+                <span id="rank-text" class="text-2xl font-bold text-text-primary"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO client loaded from local server -->
+    <script src="/socket.io-client/socket.io.min.js"></script>
+    <script src="player.js"></script>
+</body>
+
+</html>

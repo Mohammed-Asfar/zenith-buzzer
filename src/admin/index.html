@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenith Buzzer — Admin Panel</title>
+  <link rel="stylesheet" href="dist/admin.css" />
+</head>
+
+<body class="min-h-screen bg-bg-primary">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="bg-bg-secondary border-b border-border px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+        <span class="text-2xl">⚡</span>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-text-primary">Zenith Buzzer</h1>
+        <p class="text-xs text-text-muted">Admin Panel</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="round-badge" class="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm font-semibold">
+        Round 1
+      </span>
+      <span id="status-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-bg-hover text-text-secondary">
+        IDLE
+      </span>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN GRID ═══ -->
+  <main class="p-6 grid grid-cols-12 gap-6 max-w-screen-2xl mx-auto">
+
+    <!-- ── LEFT COLUMN: Connection + Players ── -->
+    <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+
+      <!-- Connection Card -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Join Information</h2>
+
+        <!-- QR Code -->
+        <div id="qr-container"
+          class="bg-white rounded-xl p-4 mx-auto w-fit mb-4 min-w-[200px] min-h-[200px] flex items-center justify-center">
+          <p class="text-gray-400 text-sm">Generating QR...</p>
+        </div>
+
+        <!-- Join URL -->
+        <div class="bg-bg-primary rounded-xl p-3 flex items-center gap-2 mb-3">
+          <span id="join-url" class="text-accent font-mono text-sm flex-1 truncate">Loading...</span>
+          <button id="btn-copy-link"
+            class="shrink-0 bg-accent/20 hover:bg-accent/30 text-accent px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            title="Copy link">
+            📋 Copy
+          </button>
+        </div>
+        <button id="btn-refresh-ip"
+          class="w-full bg-bg-hover hover:bg-border text-text-secondary text-xs py-2 rounded-lg transition-colors">
+          🔄 Refresh IP
+        </button>
+      </div>
+
+      <!-- Players Card -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6 flex-1 min-h-0 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider">
+            Players <span id="player-count" class="text-accent">(0)</span>
+          </h2>
+          <div class="flex gap-2">
+            <button id="btn-lock-joins"
+              class="bg-bg-hover hover:bg-border text-text-secondary px-2.5 py-1 rounded-lg text-xs transition-colors"
+              title="Lock/Unlock Joins">
+              🔓
+            </button>
+            <button id="btn-clear-players"
+              class="bg-danger/20 hover:bg-danger/30 text-danger px-2.5 py-1 rounded-lg text-xs transition-colors"
+              title="Clear All Players">
+              🗑️
+            </button>
+          </div>
+        </div>
+        <div id="player-list" class="flex-1 overflow-y-auto space-y-2 min-h-[120px]">
+          <p class="text-text-muted text-sm text-center py-8">Waiting for players to join...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CENTER COLUMN: Controls + Rankings ── -->
+    <div class="col-span-12 lg:col-span-5 flex flex-col gap-6">
+
+      <!-- Round Controls -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Round Controls</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <button id="btn-open"
+            class="col-span-2 bg-success hover:bg-success/80 text-white font-bold py-4 rounded-xl text-lg transition-all active:scale-95 animate-pulse-glow">
+            ▶ OPEN BUZZER
+          </button>
+          <button id="btn-close"
+            class="bg-danger hover:bg-danger/80 text-white font-bold py-3 rounded-xl transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            disabled>
+            ⏹ CLOSE
+          </button>
+          <button id="btn-reset"
+            class="bg-warning hover:bg-warning/80 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
+            ↺ RESET
+          </button>
+          <button id="btn-next"
+            class="col-span-2 bg-accent hover:bg-accent-hover text-white font-semibold py-3 rounded-xl transition-all active:scale-95">
+            ⏭ NEXT ROUND
+          </button>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Timer</h2>
+        <div class="flex items-center gap-3 mb-4">
+          <input id="timer-input" type="number" min="5" max="300" value="30"
+            class="bg-bg-primary border border-border rounded-xl px-4 py-2.5 text-center text-xl font-bold text-text-primary w-24 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <span class="text-text-muted text-sm">seconds</span>
+          <button id="btn-timer-start"
+            class="ml-auto bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-xl font-semibold transition-colors">
+            Start
+          </button>
+        </div>
+        <div class="bg-bg-primary rounded-xl p-4 text-center">
+          <span id="timer-display" class="text-5xl font-bold font-mono text-text-primary tabular-nums">00:30</span>
+        </div>
+      </div>
+
+      <!-- Rankings -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6 flex-1">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Rankings</h2>
+        <div id="ranking-list" class="space-y-2">
+          <p class="text-text-muted text-sm text-center py-8">No buzzes yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT COLUMN: Sound + Export ── -->
+    <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+
+      <!-- Sound Settings -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Sound Settings</h2>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" id="sound-round-start" checked class="w-4 h-4 rounded accent-accent" />
+            <span class="text-sm text-text-secondary">Round start</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" id="sound-first-buzz" checked class="w-4 h-4 rounded accent-accent" />
+            <span class="text-sm text-text-secondary">First buzz</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" id="sound-every-buzz" class="w-4 h-4 rounded accent-accent" />
+            <span class="text-sm text-text-secondary">Every buzz</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" id="sound-timer-end" checked class="w-4 h-4 rounded accent-accent" />
+            <span class="text-sm text-text-secondary">Timer end</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Export Results</h2>
+        <div class="space-y-3">
+          <button id="btn-export-csv"
+            class="w-full bg-bg-hover hover:bg-border text-text-primary py-2.5 rounded-xl text-sm font-semibold transition-colors">
+            📄 Export CSV
+          </button>
+          <button id="btn-export-json"
+            class="w-full bg-bg-hover hover:bg-border text-text-primary py-2.5 rounded-xl text-sm font-semibold transition-colors">
+            📋 Export JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Session Info -->
+      <div class="bg-bg-card rounded-2xl border border-border p-6">
+        <h2 class="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Session</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-text-muted">Round</span>
+            <span id="session-round" class="text-text-primary font-semibold">1</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-text-muted">Total Rounds</span>
+            <span id="session-total-rounds" class="text-text-primary font-semibold">0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-text-muted">Players</span>
+            <span id="session-players" class="text-text-primary font-semibold">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+
+</html>
