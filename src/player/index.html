@@ -15,9 +15,8 @@
         <div class="bg-bg-secondary rounded-3xl border border-border p-8 shadow-2xl">
             <!-- Logo -->
             <div class="text-center mb-8">
-                <div class="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-4">
-                    <span class="text-4xl">⚡</span>
-                </div>
+                <img src="/assets/zenith-logo.png" alt="Zenith"
+                    class="w-16 h-16 rounded-2xl mx-auto mb-4 border border-border" />
                 <h1 class="text-2xl font-bold text-text-primary tracking-tight">Zenith Buzzer</h1>
                 <p class="text-text-muted text-sm mt-1">Enter your team name to join</p>
             </div>
@@ -26,11 +25,11 @@
             <div class="space-y-4">
                 <div>
                     <input id="team-name-input" type="text" maxlength="30" placeholder="Team name" autocomplete="off"
-                        class="w-full bg-bg-primary border border-border rounded-xl px-4 py-3.5 text-text-primary text-lg placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all" />
+                        class="w-full bg-bg-primary border border-border rounded-xl px-4 py-3.5 text-text-primary text-lg placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/30 transition-all" />
                 </div>
                 <div id="join-error" class="hidden text-danger text-sm text-center font-medium"></div>
                 <button id="btn-join"
-                    class="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3.5 rounded-xl text-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+                    class="w-full bg-accent hover:bg-accent-hover text-bg-primary font-bold py-3.5 rounded-xl text-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
                     Join Game
                 </button>
             </div>
@@ -45,7 +44,13 @@
                 class="bg-bg-secondary border border-border rounded-full px-5 py-2 text-sm font-semibold text-text-secondary inline-flex items-center gap-2">
                 <span id="team-label"></span>
                 <button id="btn-edit-name" class="text-accent hover:text-accent-hover text-xs transition-colors"
-                    title="Request name change">✏️</button>
+                    title="Request name change">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                </button>
             </span>
         </div>
 
@@ -53,12 +58,12 @@
         <div id="name-change-form" class="hidden mb-6">
             <div class="bg-bg-secondary border border-border rounded-xl p-4 space-y-3">
                 <input id="new-name-input" type="text" maxlength="30" placeholder="New team name"
-                    class="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-text-primary text-sm placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent" />
+                    class="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-text-primary text-sm placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50" />
                 <div class="flex gap-2">
                     <button id="btn-submit-name-change"
-                        class="flex-1 bg-accent hover:bg-accent-hover text-white text-sm py-2 rounded-lg font-semibold transition-colors">Request</button>
+                        class="flex-1 bg-accent hover:bg-accent-hover text-bg-primary text-sm py-2 rounded-lg font-semibold transition-colors">Request</button>
                     <button id="btn-cancel-name-change"
-                        class="flex-1 bg-bg-hover text-text-secondary text-sm py-2 rounded-lg font-semibold transition-colors">Cancel</button>
+                        class="flex-1 bg-bg-hover text-text-secondary text-sm py-2 rounded-lg font-semibold transition-colors border border-border">Cancel</button>
                 </div>
                 <p id="name-change-status" class="hidden text-xs text-center"></p>
             </div>
@@ -72,7 +77,7 @@
         <!-- Buzzer Button -->
         <div class="relative">
             <button id="btn-buzz"
-                class="w-48 h-48 mx-auto rounded-full bg-gradient-to-b from-buzzer to-buzzer-active text-white text-3xl font-black uppercase tracking-wider shadow-2xl transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                class="w-48 h-48 mx-auto rounded-full bg-gradient-to-b from-buzzer to-buzzer-active text-bg-primary text-3xl font-black uppercase tracking-wider shadow-2xl transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-2 border-accent/30"
                 disabled>
                 BUZZ!
             </button>

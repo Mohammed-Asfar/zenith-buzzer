@@ -1,5 +1,5 @@
 // Electron main process — app entry point
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const { createServer, startServer } = require('./server');
 const { getLanIP } = require('./network');
@@ -17,13 +17,17 @@ function createWindow() {
         minWidth: 960,
         minHeight: 600,
         title: 'Zenith Buzzer — Admin Panel',
-        icon: path.join(__dirname, '..', '..', 'resources', 'icon.ico'),
+        icon: path.join(__dirname, '..', 'assets', 'zenith-logo.png'),
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.js'),
         },
     });
+
+    // Remove default menu bar
+    Menu.setApplicationMenu(null);
 
     mainWindow.loadFile(path.join(__dirname, '..', 'admin', 'index.html'));
 

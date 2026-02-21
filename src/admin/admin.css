@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
-/* ── Custom theme for Zenith Buzzer Admin ── */
+/* ── Zenith'26 Brand Theme — Dark + Gold/Bronze ── */
 @theme {
-  --color-bg-primary: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-bg-card: #1e293b;
-  --color-bg-hover: #334155;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  --color-border: #334155;
+  --color-bg-primary: #0a0c10;
+  --color-bg-secondary: #12151c;
+  --color-bg-card: #161921;
+  --color-bg-hover: #1e222d;
+  --color-accent: #c8a855;
+  --color-accent-hover: #b8963e;
+  --color-accent-dim: #c8a85520;
+  --color-success: #4ade80;
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+  --color-text-primary: #eae6df;
+  --color-text-secondary: #9a9489;
+  --color-text-muted: #5c574e;
+  --color-border: #2a2520;
   --color-rank-1: #fbbf24;
   --color-rank-2: #94a3b8;
   --color-rank-3: #cd7f32;
 }
 
-/* ── Base resets ── */
+/* ── Base ── */
 @layer base {
   body {
     @apply bg-bg-primary text-text-primary font-sans antialiased;
@@ -30,8 +31,8 @@
 
 /* ── Animations ── */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  50% { box-shadow: 0 0 20px 8px rgba(59, 130, 246, 0.2); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 168, 85, 0.35); }
+  50% { box-shadow: 0 0 24px 8px rgba(200, 168, 85, 0.15); }
 }
 
 @keyframes slide-in {
@@ -56,17 +57,23 @@
   animation: fade-in 0.3s ease-out forwards;
 }
 
-/* ── Scrollbar styling ── */
-::-webkit-scrollbar {
-  width: 6px;
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* ── SVG icon utility ── */
+.icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
-}
+.icon-sm { width: 14px; height: 14px; }
+.icon-lg { width: 20px; height: 20px; }

@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
-/* ── Custom theme for Player Interface ── */
+/* ── Zenith'26 Brand Theme — Player Interface ── */
 @theme {
-    --color-bg-primary: #0f172a;
-    --color-bg-secondary: #1e293b;
-    --color-bg-card: #1e293b;
-    --color-accent: #3b82f6;
-    --color-accent-hover: #2563eb;
-    --color-success: #22c55e;
-    --color-danger: #ef4444;
-    --color-warning: #f59e0b;
-    --color-text-primary: #f1f5f9;
-    --color-text-secondary: #94a3b8;
-    --color-text-muted: #64748b;
-    --color-border: #334155;
-    --color-buzzer: #ef4444;
-    --color-buzzer-active: #dc2626;
-    --color-buzzer-glow: rgba(239, 68, 68, 0.4);
+    --color-bg-primary: #0a0c10;
+    --color-bg-secondary: #12151c;
+    --color-bg-card: #161921;
+    --color-accent: #c8a855;
+    --color-accent-hover: #b8963e;
+    --color-success: #4ade80;
+    --color-danger: #f87171;
+    --color-warning: #fbbf24;
+    --color-text-primary: #eae6df;
+    --color-text-secondary: #9a9489;
+    --color-text-muted: #5c574e;
+    --color-border: #2a2520;
+    --color-buzzer: #c8a855;
+    --color-buzzer-active: #b8963e;
+    --color-buzzer-glow: rgba(200, 168, 85, 0.4);
     --color-rank-gold: #fbbf24;
 }
 
@@ -27,7 +27,7 @@
     }
 }
 
-/* ── Buzzer button animation ── */
+/* ── Buzzer animations ── */
 @keyframes buzzer-pulse {
 
     0%,
@@ -93,7 +93,7 @@
 }
 
 .animate-shimmer {
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(200, 168, 85, 0.1) 50%, transparent 100%);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
 }

@@ -143,7 +143,7 @@
         if (state === EVENTS.ROUND_OPEN && !hasBuzzed) {
             $btnBuzz.disabled = false;
             $btnBuzz.classList.add('animate-buzzer-pulse');
-            $statusMsg.innerHTML = '<p class="text-success text-xl font-bold animate-pulse">🔔 BUZZ NOW!</p>';
+            $statusMsg.innerHTML = '<p class="text-success text-xl font-bold animate-pulse">BUZZ NOW!</p>';
             // Vibrate on mobile if available
             if (navigator.vibrate) navigator.vibrate(200);
         } else if (state === EVENTS.ROUND_CLOSED) {
@@ -183,19 +183,23 @@
         $rankDisplay.querySelector('div').classList.add('animate-rank-pop');
 
         if (rank === 1) {
-            $rankIcon.textContent = '🥇';
+            $rankIcon.textContent = '★';
+            $rankIcon.className = 'text-6xl block mb-2 text-rank-gold';
             $rankText.textContent = '1st Place!';
             $rankText.className = 'text-3xl font-bold text-rank-gold';
         } else if (rank === 2) {
-            $rankIcon.textContent = '🥈';
+            $rankIcon.textContent = '★';
+            $rankIcon.className = 'text-5xl block mb-2 text-text-secondary';
             $rankText.textContent = '2nd Place';
             $rankText.className = 'text-2xl font-bold text-text-secondary';
         } else if (rank === 3) {
-            $rankIcon.textContent = '🥉';
+            $rankIcon.textContent = '★';
+            $rankIcon.className = 'text-5xl block mb-2 text-warning';
             $rankText.textContent = '3rd Place';
             $rankText.className = 'text-2xl font-bold text-warning';
         } else {
-            $rankIcon.textContent = '🏁';
+            $rankIcon.textContent = '';
+            $rankIcon.className = 'text-5xl block mb-2';
             $rankText.textContent = `#${rank}`;
             $rankText.className = 'text-2xl font-bold text-text-primary';
         }

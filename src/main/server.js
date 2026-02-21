@@ -24,6 +24,9 @@ function createServer(port = 3000) {
     // Serve player pages
     app.use(express.static(path.join(__dirname, '..', 'player')));
 
+    // Serve shared assets (logo, etc.)
+    app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+
     // Serve socket.io-client bundle so players can connect offline
     app.use(
         '/socket.io-client',

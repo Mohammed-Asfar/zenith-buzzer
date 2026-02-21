@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zenith Buzzer — Admin Panel</title>
   <link rel="stylesheet" href="dist/admin.css" />
+  <!-- SVG icon sprite (inline) -->
+  <style>
+    .logo-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+  </style>
 </head>
 
 <body class="h-screen bg-bg-primary flex flex-col overflow-hidden">
@@ -13,19 +22,19 @@
   <!-- ═══ HEADER ═══ -->
   <header class="bg-bg-secondary border-b border-border px-6 py-3 flex items-center justify-between shrink-0">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-accent/20 flex items-center justify-center">
-        <span class="text-xl">⚡</span>
-      </div>
+      <img src="../assets/zenith-logo.png" alt="Zenith" class="logo-img" />
       <div>
         <h1 class="text-lg font-bold tracking-tight text-text-primary leading-tight">Zenith Buzzer</h1>
-        <p class="text-xs text-text-muted leading-tight">Admin Panel</p>
+        <p class="text-[10px] text-text-muted leading-tight uppercase tracking-widest">Admin Panel</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <span id="round-badge" class="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm font-semibold">
+      <span id="round-badge"
+        class="bg-accent/15 text-accent px-3 py-1 rounded-full text-sm font-semibold border border-accent/20">
         Round 1
       </span>
-      <span id="status-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-bg-hover text-text-secondary">
+      <span id="status-badge"
+        class="px-3 py-1 rounded-full text-sm font-semibold bg-bg-hover text-text-secondary border border-border">
         IDLE
       </span>
     </div>
@@ -36,8 +45,6 @@
 
     <!-- ── LEFT COLUMN: Players ── -->
     <div class="col-span-3 flex flex-col gap-4 min-h-0">
-
-      <!-- Players Card — fills full column now -->
       <div class="bg-bg-card rounded-2xl border border-border p-4 flex-1 min-h-0 flex flex-col overflow-hidden">
         <div class="flex items-center justify-between mb-3 shrink-0">
           <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider">
@@ -45,19 +52,36 @@
           </h2>
           <div class="flex gap-1.5">
             <button id="btn-show-connection"
-              class="bg-accent/20 hover:bg-accent/30 text-accent px-2 py-0.5 rounded text-xs font-semibold transition-colors"
+              class="bg-accent/15 hover:bg-accent/25 text-accent px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-colors border border-accent/20"
               title="Show QR & Join Link">
-              📱 QR
+              <svg class="icon-sm inline -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="3" height="3" />
+                <line x1="21" y1="14" x2="21" y2="14.01" />
+                <line x1="21" y1="21" x2="21" y2="21.01" />
+                <line x1="14" y1="21" x2="14" y2="21.01" />
+              </svg>
+              QR
             </button>
             <button id="btn-lock-joins"
-              class="bg-bg-hover hover:bg-border text-text-secondary px-2 py-0.5 rounded text-xs transition-colors"
+              class="bg-bg-hover hover:bg-border text-text-secondary px-2 py-1 rounded-lg text-[10px] transition-colors border border-border"
               title="Lock/Unlock Joins">
-              🔓
+              <svg id="lock-icon" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
             </button>
             <button id="btn-clear-players"
-              class="bg-danger/20 hover:bg-danger/30 text-danger px-2 py-0.5 rounded text-xs transition-colors"
+              class="bg-danger/10 hover:bg-danger/20 text-danger px-2 py-1 rounded-lg text-[10px] transition-colors border border-danger/15"
               title="Clear All Players">
-              🗑️
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
             </button>
           </div>
         </div>
@@ -69,34 +93,37 @@
 
     <!-- ═══ CONNECTION DIALOG (Modal) ═══ -->
     <div id="connection-dialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
       <div
         class="bg-bg-card rounded-3xl border border-border p-8 shadow-2xl max-w-md w-full mx-4 relative animate-fade-in">
-        <!-- Close button -->
         <button id="btn-close-dialog"
-          class="absolute top-4 right-4 text-text-muted hover:text-text-primary text-xl transition-colors"
-          title="Close">✕</button>
+          class="absolute top-4 right-4 text-text-muted hover:text-text-primary transition-colors" title="Close">
+          <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
 
-        <h2 class="text-lg font-bold text-text-primary mb-6 text-center">Join Information</h2>
+        <div class="flex items-center gap-3 mb-6 justify-center">
+          <img src="../assets/zenith-logo.png" alt="Zenith" class="w-10 h-10 rounded-xl" />
+          <h2 class="text-lg font-bold text-text-primary">Join Information</h2>
+        </div>
 
-        <!-- QR Code — large and centered -->
         <div id="qr-container" class="bg-white rounded-2xl p-5 mx-auto w-fit mb-6 flex items-center justify-center">
           <p class="text-gray-400 text-sm">Generating QR...</p>
         </div>
 
-        <!-- Join URL -->
-        <div class="bg-bg-primary rounded-xl p-3 flex items-center gap-3 mb-4">
+        <div class="bg-bg-primary rounded-xl p-3 flex items-center gap-3 mb-4 border border-border">
           <span id="join-url" class="text-accent font-mono text-sm flex-1 text-center truncate">Loading...</span>
           <button id="btn-copy-link"
-            class="shrink-0 bg-accent/20 hover:bg-accent/30 text-accent px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-            title="Copy link">
-            📋 Copy
+            class="shrink-0 bg-accent/15 hover:bg-accent/25 text-accent px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border border-accent/20">
+            Copy
           </button>
         </div>
 
         <button id="btn-refresh-ip"
-          class="w-full bg-bg-hover hover:bg-border text-text-secondary text-xs py-2.5 rounded-xl transition-colors">
-          🔄 Refresh IP
+          class="w-full bg-bg-hover hover:bg-border text-text-secondary text-xs py-2.5 rounded-xl transition-colors border border-border">
+          Refresh IP
         </button>
       </div>
     </div>
@@ -112,21 +139,36 @@
           <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Round Controls</h2>
           <div class="grid grid-cols-2 gap-2">
             <button id="btn-open"
-              class="col-span-2 bg-success hover:bg-success/80 text-white font-bold py-3 rounded-xl text-base transition-all active:scale-95 animate-pulse-glow">
-              ▶ OPEN BUZZER
+              class="col-span-2 bg-success/90 hover:bg-success text-bg-primary font-bold py-3 rounded-xl text-base transition-all active:scale-95 animate-pulse-glow">
+              <svg class="icon inline -mt-0.5 mr-1" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              OPEN BUZZER
             </button>
             <button id="btn-close"
-              class="bg-danger hover:bg-danger/80 text-white font-semibold py-2 rounded-xl text-sm transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+              class="bg-danger/90 hover:bg-danger text-white font-semibold py-2 rounded-xl text-sm transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
               disabled>
-              ⏹ CLOSE
+              <svg class="icon-sm inline -mt-0.5 mr-0.5" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <rect x="6" y="6" width="12" height="12" rx="1" />
+              </svg>
+              CLOSE
             </button>
             <button id="btn-reset"
-              class="bg-warning hover:bg-warning/80 text-white font-semibold py-2 rounded-xl text-sm transition-all active:scale-95">
-              ↺ RESET
+              class="bg-warning/90 hover:bg-warning text-bg-primary font-semibold py-2 rounded-xl text-sm transition-all active:scale-95">
+              <svg class="icon-sm inline -mt-0.5 mr-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
+              RESET
             </button>
             <button id="btn-next"
-              class="col-span-2 bg-accent hover:bg-accent-hover text-white font-semibold py-2 rounded-xl text-sm transition-all active:scale-95">
-              ⏭ NEXT ROUND
+              class="col-span-2 bg-accent hover:bg-accent-hover text-bg-primary font-semibold py-2 rounded-xl text-sm transition-all active:scale-95">
+              <svg class="icon-sm inline -mt-0.5 mr-0.5" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <polygon points="5 4 15 12 5 20 5 4" />
+                <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2" />
+              </svg>
+              NEXT ROUND
             </button>
           </div>
         </div>
@@ -136,20 +178,20 @@
           <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Timer</h2>
           <div class="flex items-center gap-2 mb-3">
             <input id="timer-input" type="number" min="5" max="300" value="30"
-              class="bg-bg-primary border border-border rounded-lg px-3 py-2 text-center text-lg font-bold text-text-primary w-20 focus:outline-none focus:ring-2 focus:ring-accent" />
+              class="bg-bg-primary border border-border rounded-lg px-3 py-2 text-center text-lg font-bold text-text-primary w-20 focus:outline-none focus:ring-2 focus:ring-accent/50" />
             <span class="text-text-muted text-xs">sec</span>
             <button id="btn-timer-start"
-              class="ml-auto bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+              class="ml-auto bg-accent hover:bg-accent-hover text-bg-primary px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
               Start
             </button>
           </div>
-          <div class="bg-bg-primary rounded-xl p-3 text-center">
+          <div class="bg-bg-primary rounded-xl p-3 text-center border border-border">
             <span id="timer-display" class="text-4xl font-bold font-mono text-text-primary tabular-nums">00:30</span>
           </div>
         </div>
       </div>
 
-      <!-- Rankings — fills remaining space -->
+      <!-- Rankings -->
       <div class="bg-bg-card rounded-2xl border border-border p-4 flex-1 min-h-0 flex flex-col overflow-hidden">
         <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3 shrink-0">Rankings</h2>
         <div id="ranking-list" class="space-y-1.5 flex-1 overflow-y-auto min-h-0">
@@ -158,7 +200,7 @@
       </div>
     </div>
 
-    <!-- ── RIGHT COLUMN: Sound + Requests + Export + Session ── -->
+    <!-- ── RIGHT COLUMN ── -->
     <div class="col-span-3 flex flex-col gap-4 min-h-0 overflow-y-auto">
 
       <!-- Sound Settings -->
@@ -199,12 +241,22 @@
         <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Export Results</h2>
         <div class="space-y-2">
           <button id="btn-export-csv"
-            class="w-full bg-bg-hover hover:bg-border text-text-primary py-2 rounded-xl text-xs font-semibold transition-colors">
-            📄 Export CSV
+            class="w-full bg-bg-hover hover:bg-border text-text-primary py-2 rounded-xl text-xs font-semibold transition-colors border border-border">
+            <svg class="icon-sm inline -mt-0.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Export CSV
           </button>
           <button id="btn-export-json"
-            class="w-full bg-bg-hover hover:bg-border text-text-primary py-2 rounded-xl text-xs font-semibold transition-colors">
-            📋 Export JSON
+            class="w-full bg-bg-hover hover:bg-border text-text-primary py-2 rounded-xl text-xs font-semibold transition-colors border border-border">
+            <svg class="icon-sm inline -mt-0.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Export JSON
           </button>
         </div>
       </div>

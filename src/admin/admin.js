@@ -31,13 +31,11 @@
     let currentState = EVENTS.ROUND_IDLE;
     let pendingRequests = [];
 
-    // ── Sound context (Web Audio API for synthesized sounds) ──
+    // ── Sound (Web Audio API) ──
     let audioCtx;
 
     function getAudioCtx() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         return audioCtx;
     }
 
@@ -96,8 +94,6 @@
         $joinURL.textContent = info.joinURL;
         generateQR(info.joinURL);
 
-        // Connect Socket.IO to admin namespace
-        // Load socket.io client from the local server
         const script = document.createElement('script');
         script.src = `http://localhost:${info.port}/socket.io/socket.io.js`;
         script.onload = () => {
@@ -105,11 +101,10 @@
             setupSocketEvents();
         };
         document.head.appendChild(script);
-
         setupUI();
     }
 
-    // ── QR Code (generated in main process via IPC) ──
+    // ── QR Code ──
     async function generateQR(url) {
         const dataURL = await window.electronAPI.generateQR(url);
         if (dataURL) {
@@ -130,23 +125,18 @@
             updatePlayerList(players);
         });
 
-        socket.on(EVENTS.SERVER_PLAYER_JOINED, (data) => {
-            // Sound or notification handled by player list update
-        });
+        socket.on(EVENTS.SERVER_PLAYER_JOINED, () => { });
 
         socket.on(EVENTS.SERVER_BUZZ_RECEIVED, (data) => {
             playBuzzSound(data.rank === 1);
-            // Rankings update comes with round state
         });
 
-        socket.on(EVENTS.SERVER_PLAYER_LEFT, (data) => {
-            // Player list update will follow
-        });
+        socket.on(EVENTS.SERVER_PLAYER_LEFT, () => { });
 
         socket.on(EVENTS.SERVER_NAME_CHANGE_REQUEST, (data) => {
             pendingRequests.push(data);
             renderNameRequests();
-            playTone(600, 0.15, 'sine'); // notification sound
+            playTone(600, 0.15, 'sine');
         });
     }
 
@@ -154,24 +144,21 @@
     function updateRoundUI(data) {
         const { state, roundNumber, buzzes } = data;
 
-        // Status badge
         $statusBadge.textContent = state;
-        $statusBadge.className = 'px-3 py-1 rounded-full text-sm font-semibold ';
+        $statusBadge.className = 'px-3 py-1 rounded-full text-sm font-semibold border ';
         if (state === EVENTS.ROUND_OPEN) {
-            $statusBadge.className += 'bg-success/20 text-success';
+            $statusBadge.className += 'bg-success/15 text-success border-success/20';
         } else if (state === EVENTS.ROUND_CLOSED) {
-            $statusBadge.className += 'bg-danger/20 text-danger';
+            $statusBadge.className += 'bg-danger/15 text-danger border-danger/20';
         } else {
-            $statusBadge.className += 'bg-bg-hover text-text-secondary';
+            $statusBadge.className += 'bg-bg-hover text-text-secondary border-border';
         }
 
-        // Round badge
         if (roundNumber !== undefined) {
             $roundBadge.textContent = `Round ${roundNumber}`;
             $sessionRound.textContent = roundNumber;
         }
 
-        // Button states
         const btnOpen = document.getElementById('btn-open');
         const btnClose = document.getElementById('btn-close');
 
@@ -195,10 +182,7 @@
             btnClose.classList.add('opacity-30', 'cursor-not-allowed');
         }
 
-        // Rankings
-        if (buzzes) {
-            updateRankings(buzzes);
-        }
+        if (buzzes) updateRankings(buzzes);
     }
 
     function updateRankings(buzzes) {
@@ -210,18 +194,16 @@
         $rankingList.innerHTML = buzzes.map((buzz) => {
             let rankColor = 'text-text-primary';
             let rankBg = 'bg-bg-hover';
-            let icon = '';
-            if (buzz.rank === 1) { rankColor = 'text-rank-1'; rankBg = 'bg-rank-1/10'; icon = '🥇'; }
-            else if (buzz.rank === 2) { rankColor = 'text-rank-2'; rankBg = 'bg-rank-2/10'; icon = '🥈'; }
-            else if (buzz.rank === 3) { rankColor = 'text-rank-3'; rankBg = 'bg-rank-3/10'; icon = '🥉'; }
-            else { icon = `#${buzz.rank}`; }
+            let label = `#${buzz.rank}`;
+            if (buzz.rank === 1) { rankColor = 'text-rank-1'; rankBg = 'bg-rank-1/10'; label = '1st'; }
+            else if (buzz.rank === 2) { rankColor = 'text-rank-2'; rankBg = 'bg-rank-2/10'; label = '2nd'; }
+            else if (buzz.rank === 3) { rankColor = 'text-rank-3'; rankBg = 'bg-rank-3/10'; label = '3rd'; }
 
             return `
-        <div class="${rankBg} rounded-xl px-4 py-3 flex items-center gap-3 animate-slide-in">
-          <span class="${rankColor} text-lg font-bold w-8 text-center">${icon}</span>
-          <span class="text-text-primary font-semibold flex-1">${escapeHTML(buzz.teamName)}</span>
-        </div>
-      `;
+        <div class="${rankBg} rounded-xl px-4 py-3 flex items-center gap-3 animate-slide-in border border-border/50">
+          <span class="${rankColor} text-sm font-bold w-8 text-center">${label}</span>
+          <span class="text-text-primary font-semibold flex-1 text-sm">${escapeHTML(buzz.teamName)}</span>
+        </div>`;
         }).join('');
     }
 
@@ -235,29 +217,30 @@
         }
 
         $playerList.innerHTML = players.map((p) => `
-      <div class="bg-bg-primary rounded-xl px-3 py-2.5 flex items-center gap-3 animate-fade-in">
+      <div class="bg-bg-primary rounded-xl px-3 py-2.5 flex items-center gap-3 animate-fade-in border border-border/50">
         <span class="w-2 h-2 rounded-full ${p.online ? 'bg-success' : 'bg-text-muted'}"></span>
         <span class="text-text-primary text-sm font-medium flex-1 truncate">${escapeHTML(p.teamName)}</span>
-        <span class="text-text-muted text-xs">#${p.joinOrder}</span>
-        ${p.buzzed ? '<span class="text-warning text-xs font-semibold">BUZZED</span>' : ''}
+        <span class="text-text-muted text-[10px]">#${p.joinOrder}</span>
+        ${p.buzzed ? '<span class="text-accent text-[10px] font-bold uppercase tracking-wider">Buzzed</span>' : ''}
         <button onclick="removePlayer('${escapeHTML(p.teamName)}')"
-          class="text-danger/60 hover:text-danger text-xs transition-colors">✕</button>
+          class="text-danger/50 hover:text-danger transition-colors">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
     `).join('');
     }
 
     // ── UI Event Handlers ──
     function setupUI() {
-        // Round controls
         document.getElementById('btn-open').addEventListener('click', () => {
             socket.emit(EVENTS.ADMIN_OPEN_BUZZER, {});
             playRoundStartSound();
-            startTimer(); // Auto-start timer when buzzer opens
+            startTimer();
         });
 
         document.getElementById('btn-close').addEventListener('click', () => {
             socket.emit(EVENTS.ADMIN_CLOSE_BUZZER);
-            stopTimer(); // Auto-stop timer when buzzer closes
+            stopTimer();
         });
 
         document.getElementById('btn-reset').addEventListener('click', () => {
@@ -292,10 +275,9 @@
             try {
                 await navigator.clipboard.writeText(url);
                 const btn = document.getElementById('btn-copy-link');
-                btn.textContent = '✓ Copied!';
-                setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
             } catch (e) {
-                // Fallback
                 const input = document.createElement('input');
                 input.value = url;
                 document.body.appendChild(input);
@@ -317,7 +299,16 @@
             joinLocked = !joinLocked;
             socket.emit(EVENTS.ADMIN_LOCK_JOINS, { locked: joinLocked });
             const btn = document.getElementById('btn-lock-joins');
-            btn.textContent = joinLocked ? '🔒' : '🔓';
+            const lockIcon = document.getElementById('lock-icon');
+            if (joinLocked) {
+                // Locked: closed shackle + accent style
+                lockIcon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>';
+                btn.className = 'bg-accent/20 hover:bg-accent/30 text-accent px-2 py-1 rounded-lg text-[10px] transition-colors border border-accent/30';
+            } else {
+                // Unlocked: open shackle + default style
+                lockIcon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 5-5 5 5 0 0 1 5 5"/>';
+                btn.className = 'bg-bg-hover hover:bg-border text-text-secondary px-2 py-1 rounded-lg text-[10px] transition-colors border border-border';
+            }
         });
 
         // Clear players
@@ -327,7 +318,7 @@
             }
         });
 
-        // Timer — manual start/stop still available
+        // Timer
         document.getElementById('btn-timer-start').addEventListener('click', () => {
             if (timerInterval) {
                 stopTimer();
@@ -352,7 +343,6 @@
         $timerDisplay.textContent =
             String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
 
-        // Color feedback
         if (seconds <= 5 && seconds > 0) {
             $timerDisplay.classList.add('text-danger');
             $timerDisplay.classList.remove('text-warning', 'text-text-primary');
@@ -365,9 +355,8 @@
         }
     }
 
-    // ── Timer helpers ──
     function startTimer() {
-        if (timerInterval) return; // Already running
+        if (timerInterval) return;
         const btn = document.getElementById('btn-timer-start');
         timerSeconds = parseInt($timerInput.value) || 30;
         updateTimerDisplay(timerSeconds);
@@ -380,7 +369,6 @@
                 clearInterval(timerInterval);
                 timerInterval = null;
                 btn.textContent = 'Start';
-                // Auto-close buzzer when timer ends
                 if (currentState === EVENTS.ROUND_OPEN) {
                     socket.emit(EVENTS.ADMIN_CLOSE_BUZZER);
                 }
@@ -420,17 +408,17 @@
         }
 
         $list.innerHTML = pendingRequests.map((req) => `
-          <div class="bg-bg-primary rounded-xl px-3 py-2.5 animate-fade-in" id="req-${req.requestId}">
+          <div class="bg-bg-primary rounded-xl px-3 py-2.5 animate-fade-in border border-border/50" id="req-${req.requestId}">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-text-muted text-xs">"${escapeHTML(req.oldName)}"</span>
-              <span class="text-accent text-xs">→</span>
+              <span class="text-accent text-xs font-bold">&rarr;</span>
               <span class="text-text-primary text-xs font-semibold">"${escapeHTML(req.newName)}"</span>
             </div>
             <div class="flex gap-2">
               <button onclick="approveNameChange('${req.requestId}')"
-                class="flex-1 bg-success/20 hover:bg-success/30 text-success text-xs py-1.5 rounded-lg font-semibold transition-colors">✓ Approve</button>
+                class="flex-1 bg-success/15 hover:bg-success/25 text-success text-xs py-1.5 rounded-lg font-semibold transition-colors border border-success/20">Approve</button>
               <button onclick="denyNameChange('${req.requestId}')"
-                class="flex-1 bg-danger/20 hover:bg-danger/30 text-danger text-xs py-1.5 rounded-lg font-semibold transition-colors">✕ Deny</button>
+                class="flex-1 bg-danger/15 hover:bg-danger/25 text-danger text-xs py-1.5 rounded-lg font-semibold transition-colors border border-danger/20">Deny</button>
             </div>
           </div>
         `).join('');
@@ -448,7 +436,6 @@
         renderNameRequests();
     };
 
-    // Expose removePlayer globally for inline onclick
     window.removePlayer = function (teamName) {
         socket.emit(EVENTS.ADMIN_REMOVE_PLAYER, { teamName });
     };
